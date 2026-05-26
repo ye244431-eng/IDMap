@@ -1,0 +1,784 @@
+/* =============================================
+           Red Seal Archive · 朱砂印泥 · 公文档案
+           Neo-brutalist archival aesthetic inspired
+           by Chinese red seal stamps, constructivist
+           posters, and government document design.
+           Deliberately anti-generic-AI.
+           ============================================= */
+
+        /* ===== Foundation: Red Seal Vermillion ===== */
+        :root {
+            /* The one true accent — red seal stamp */
+            --h-pri: 350; --s-pri: 72%; --l-pri: 44%;
+            --h-acc: 350; --s-acc: 72%; --l-acc: 44%;
+        }
+
+        /* ===== Design Tokens: Light — Aged Archival Paper ===== */
+        :root,
+        [data-theme="light"] {
+            color-scheme: light;
+
+            /* Sharp edges — bureaucratic precision */
+            --radius-sm: 2px;
+            --radius-md: 2px;
+            --radius-lg: 2px;
+            --radius-xl: 2px;
+
+            /* Offset shadows — no blur, hard reality */
+            --shadow-subtle: 2px 2px 0 rgba(0,0,0,0.06);
+            --shadow-elevated: 4px 4px 0 rgba(0,0,0,0.10);
+            --shadow-high: 6px 6px 0 rgba(0,0,0,0.14);
+
+            /* Animation — mechanical, decisive */
+            --dur-fast: 100ms;
+            --dur-normal: 180ms;
+            --dur-slow: 300ms;
+            --spring: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-out-expo: cubic-bezier(0.2, 0, 0, 1);
+
+            /* Solid archival surfaces — no glass, no blur */
+            --surface-primary: #F5EDE0;
+            --surface-elevated: #EDE5D8;
+            --surface-toolbar: #FFFFFF;
+            --surface-interactive: #E8E0D4;
+            --surface-pressed: #D8CFC0;
+
+            /* Borders — hard lines */
+            --border: 2px solid #B5A898;
+            --border-subtle: 1px solid #D5CCC0;
+            --border-focus: 2px solid #C41E3A;
+
+            /* Solid palette */
+            --color-bg: #F5EDE0;
+            --color-surface: #EDE5D8;
+            --color-text: #1A1410;
+            --color-text-secondary: #6B5E53;
+            --color-primary: #C41E3A;
+            --color-primary-dark: #8B0000;
+            --color-primary-glow: rgba(196,30,58,0.12);
+            --color-accent: #C41E3A;
+            --color-accent-glow: rgba(196,30,58,0.15);
+            --color-error: #C41E3A;
+            --color-input-bg: #FFFFFF;
+            --logo-bg: var(--color-primary);
+
+            /* Map tokens — archival paper tints (JS-read, names preserved) */
+            --map-area: #EBE3D5;
+            --map-border: #B5A898;
+            --map-label: #7A6E62;
+            --map-emphasis-area: rgba(196,30,58,0.10);
+            --map-emphasis-border: #C41E3A;
+            --map-highlight-area: #C41E3A;
+            --map-highlight-border: #8B0000;
+            --map-highlight-shadow: rgba(196,30,58,0.30);
+            --map-highlight-title: #1A1410;
+            --map-highlight-detail: #5C4F44;
+            --tooltip-bg: #FFFFFF;
+            --tooltip-border: #1A1A1A;
+            --tooltip-text: var(--color-text);
+            --spinner-track: #D8CFC0;
+
+            /* Icon wells — uniform archival tints */
+            --icon-bg-1: #EDE5D8;
+            --icon-bg-2: #EBE3D5;
+            --icon-bg-3: #F0E8DA;
+            --icon-bg-4: #EDE5D8;
+            --icon-color: #C41E3A;
+        }
+
+        /* ===== Dark Mode — Deep Archive Ink ===== */
+        [data-theme="dark"] {
+            color-scheme: dark;
+
+            --shadow-subtle: 2px 2px 0 rgba(0,0,0,0.30);
+            --shadow-elevated: 4px 4px 0 rgba(0,0,0,0.40);
+            --shadow-high: 6px 6px 0 rgba(196,30,58,0.12);
+
+            --surface-primary: #141210;
+            --surface-elevated: #1A1815;
+            --surface-toolbar: #0D0B0A;
+            --surface-interactive: #1E1C18;
+            --surface-pressed: #24211C;
+
+            --border: 2px solid #2A2520;
+            --border-subtle: 1px solid #1E1C18;
+
+            --color-bg: #0D0B0A;
+            --color-surface: #141210;
+            --color-text: #EDE8E0;
+            --color-text-secondary: #8B8075;
+            --color-primary: #E8344E;
+            --color-primary-dark: #C41E3A;
+            --color-primary-glow: rgba(232,52,78,0.15);
+            --color-accent: #E8344E;
+            --color-accent-glow: rgba(232,52,78,0.18);
+            --color-error: #E8344E;
+            --color-input-bg: #1A1815;
+            --logo-bg: #C41E3A;
+
+            --map-area: #1A1A1A;
+            --map-border: #3A3530;
+            --map-label: #8B8075;
+            --map-emphasis-area: rgba(232,52,78,0.15);
+            --map-emphasis-border: #E8344E;
+            --map-highlight-area: #E8344E;
+            --map-highlight-border: #FF4058;
+            --map-highlight-shadow: rgba(232,52,78,0.40);
+            --map-highlight-title: #EDE8E0;
+            --map-highlight-detail: #B5A898;
+            --tooltip-bg: #1A1A1A;
+            --tooltip-border: #C41E3A;
+            --tooltip-text: var(--color-text);
+            --spinner-track: #2A2520;
+
+            --icon-bg-1: #1E1C18;
+            --icon-bg-2: #1A1815;
+            --icon-bg-3: #24211C;
+            --icon-bg-4: #1E1C18;
+            --icon-color: #E8344E;
+        }
+
+        /* ===== System Dark Mode Fallback ===== */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --shadow-subtle: 2px 2px 0 rgba(0,0,0,0.30);
+                --shadow-elevated: 4px 4px 0 rgba(0,0,0,0.40);
+                --shadow-high: 6px 6px 0 rgba(196,30,58,0.12);
+                --surface-primary: #141210;
+                --surface-elevated: #1A1815;
+                --surface-toolbar: #0D0B0A;
+                --surface-interactive: #1E1C18;
+                --surface-pressed: #24211C;
+                --border: 2px solid #2A2520;
+                --border-subtle: 1px solid #1E1C18;
+                --color-bg: #0D0B0A;
+                --color-surface: #141210;
+                --color-text: #EDE8E0;
+                --color-text-secondary: #8B8075;
+                --color-primary: #E8344E;
+                --color-primary-dark: #C41E3A;
+                --color-input-bg: #1A1815;
+                --logo-bg: #C41E3A;
+                color-scheme: dark;
+            }
+        }
+
+        /* =============================================
+           Global Reset & Typography
+           ============================================= */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
+            font-size: clamp(0.938rem, 0.9rem + 0.2vw, 1rem);
+            line-height: 1.6;
+            transition: background var(--dur-slow) var(--ease-out-expo),
+                        color var(--dur-slow) var(--ease-out-expo);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== Atmosphere: Paper Grain + Red Seal Watermark + Diagonal Stripe ===== */
+        .bg-particles {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 0;
+            /* Noise grain texture */
+            background:
+                repeating-conic-gradient(#000 0% 0.0001%, transparent 0.0001% 0.0003%);
+            opacity: 0.025;
+        }
+        /* Red Seal Circle — 公章 watermark */
+        .bg-particles::before {
+            content: '';
+            position: fixed;
+            width: 380px; height: 380px;
+            top: 45%; left: 58%;
+            transform: translate(-50%, -50%) rotate(15deg);
+            border-radius: 50%;
+            border: 4px solid rgba(196, 30, 58, 0.05);
+            background:
+                repeating-conic-gradient(
+                    rgba(196, 30, 58, 0.025) 0deg 3deg,
+                    transparent 3deg 6deg
+                );
+            box-shadow: 0 0 0 10px rgba(196, 30, 58, 0.02),
+                        0 0 0 18px rgba(196, 30, 58, 0.015);
+            pointer-events: none; z-index: 0;
+        }
+        [data-theme="dark"] .bg-particles::before {
+            border-color: rgba(232, 52, 78, 0.06);
+            background:
+                repeating-conic-gradient(
+                    rgba(232, 52, 78, 0.03) 0deg 3deg,
+                    transparent 3deg 6deg
+                );
+            box-shadow: 0 0 0 10px rgba(232, 52, 78, 0.025),
+                        0 0 0 18px rgba(232, 52, 78, 0.015);
+        }
+        /* Diagonal constructivist red stripe */
+        .bg-particles::after {
+            content: '';
+            position: fixed;
+            width: 5px; height: 140%;
+            top: -20%; left: 44%;
+            background: rgba(196, 30, 58, 0.035);
+            transform: rotate(-14deg);
+            pointer-events: none;
+        }
+        [data-theme="dark"] .bg-particles::after {
+            background: rgba(232, 52, 78, 0.04);
+        }
+
+        .app-container {
+            position: relative; z-index: 1;
+            max-width: 1300px; margin: 0 auto;
+            padding: clamp(16px, 3vw, 28px);
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        /* =============================================
+           Header — Seal & Identity
+           ============================================= */
+        .header {
+            display: flex; align-items: center; justify-content: center;
+            padding: clamp(12px, 2vw, 20px) 0 12px;
+            position: relative;
+            border-bottom: 2px solid var(--color-primary);
+            margin-bottom: 8px;
+            animation: reveal-down var(--dur-slow) var(--ease-out-expo) both;
+        }
+        .header .brand { display: flex; align-items: center; gap: 14px; }
+        .header .logo-icon {
+            width: 48px; height: 48px;
+            background: var(--color-primary);
+            border: 2px solid #1A1410;
+            border-radius: var(--radius-sm);
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: transform var(--dur-fast) var(--spring),
+                        box-shadow var(--dur-fast) var(--spring);
+        }
+        [data-theme="dark"] .header .logo-icon {
+            border-color: #EDE8E0;
+            box-shadow: 3px 3px 0 rgba(196,30,58,0.20);
+        }
+        .header .logo-icon:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.18);
+        }
+        .header .logo-icon svg { width: 22px; height: 22px; }
+        .header h1 {
+            font-family: 'ZCOOL XiaoWei', 'STSong', 'SimSun', 'PingFang SC', serif;
+            font-size: clamp(1.4rem, 1.3rem + 1.2vw, 2rem);
+            font-weight: 400; letter-spacing: 0.06em;
+            color: var(--color-text);
+        }
+        .header .subtitle {
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            font-size: 0.6875rem; color: var(--color-text-secondary);
+            letter-spacing: 0.12em; margin-top: 4px;
+            border-left: 3px solid var(--color-primary);
+            padding-left: 10px;
+        }
+        .header-text { display: flex; flex-direction: column; }
+
+        /* Theme toggle — archival switch */
+        .header-actions {
+            position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .theme-toggle {
+            width: 40px; height: 40px;
+            background: var(--surface-interactive);
+            border: var(--border); border-radius: var(--radius-sm);
+            color: var(--color-text-secondary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-subtle);
+            transition: all var(--dur-fast) var(--spring);
+        }
+        .theme-toggle:hover {
+            background: var(--surface-primary);
+            box-shadow: var(--shadow-elevated);
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        .theme-toggle:active { transform: translate(1px, 1px); box-shadow: none; }
+        .theme-toggle svg { width: 18px; height: 18px; }
+        .easter-toggle {
+            height: 40px;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0 10px;
+            background: var(--surface-interactive);
+            border: var(--border); border-radius: var(--radius-sm);
+            color: var(--color-text-secondary); cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+            white-space: nowrap; user-select: none;
+            transition: all var(--dur-fast) var(--spring);
+        }
+        .easter-toggle:hover {
+            background: var(--surface-primary);
+            box-shadow: var(--shadow-elevated);
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        .easter-toggle:active { transform: translate(1px, 1px); box-shadow: none; }
+        .easter-toggle input {
+            width: 14px; height: 14px;
+            accent-color: var(--color-primary);
+        }
+
+        /* =============================================
+           Input Bar — Document Terminal
+           ============================================= */
+        .input-card {
+            background: var(--surface-toolbar);
+            border: var(--border); border-radius: var(--radius-sm);
+            padding: clamp(16px, 2vw, 22px) clamp(18px, 2.5vw, 28px);
+            margin: 14px 0;
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            justify-content: center;
+            box-shadow: var(--shadow-elevated);
+            transition: border-color var(--dur-fast) var(--spring),
+                        box-shadow var(--dur-fast) var(--spring);
+            animation: reveal-up var(--dur-slow) var(--ease-out-expo) 0.08s both;
+        }
+        .input-card:focus-within {
+            border-color: var(--color-primary);
+            box-shadow: 5px 5px 0 rgba(196,30,58,0.12);
+        }
+        .input-card label {
+            font-family: 'ZCOOL XiaoWei', 'STSong', 'SimSun', serif;
+            font-size: 1rem; font-weight: 400; white-space: nowrap;
+            color: var(--color-text); letter-spacing: 0.08em;
+        }
+        .input-card input {
+            flex: 1; min-width: 260px; padding: 10px 16px;
+            font-size: 1rem; letter-spacing: 0.15em;
+            border: var(--border); border-radius: var(--radius-sm);
+            background: var(--color-input-bg);
+            color: var(--color-text); outline: none;
+            font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+            transition: all var(--dur-fast) var(--spring);
+        }
+        .input-card input:focus {
+            border-color: var(--color-primary);
+            box-shadow: 3px 3px 0 rgba(196,30,58,0.08);
+        }
+        .input-card input::placeholder {
+            letter-spacing: 0.06em; color: var(--color-text-secondary);
+            opacity: 0.35; font-size: 0.875rem;
+        }
+        .extend-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface-interactive);
+            box-shadow: var(--shadow-subtle);
+            cursor: pointer;
+            user-select: none;
+        }
+        .extend-toggle input {
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            flex: 0 0 auto;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            letter-spacing: 0;
+            accent-color: var(--color-primary);
+            box-shadow: none;
+        }
+        .extend-toggle span {
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--color-text);
+            white-space: nowrap;
+        }
+        .extend-select {
+            min-width: 160px;
+            padding: 10px 12px;
+            border: var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--color-input-bg);
+            color: var(--color-text);
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            font-size: 0.8125rem;
+            outline: none;
+        }
+        .extend-select:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        /* =============================================
+           Buttons — Stamped & Decisive
+           ============================================= */
+        .btn {
+            padding: 10px 22px; font-size: 0.8125rem; font-weight: 700;
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            letter-spacing: 0.06em; white-space: nowrap; text-transform: uppercase;
+            cursor: pointer; border: 2px solid #1A1410; border-radius: var(--radius-sm);
+            background: var(--surface-interactive);
+            box-shadow: var(--shadow-subtle);
+            transition: all var(--dur-fast) var(--spring);
+            position: relative;
+        }
+        [data-theme="dark"] .btn { border-color: #EDE8E0; }
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #FFFFFF; border-color: var(--color-primary-dark);
+            box-shadow: var(--shadow-elevated);
+        }
+        .btn-primary:hover {
+            background: var(--color-primary-dark);
+            transform: translate(-1px, -1px);
+            box-shadow: var(--shadow-high);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+            transform: none;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .btn-demo {
+            background: var(--surface-toolbar); color: var(--color-text);
+        }
+        .btn-demo:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-elevated);
+            transform: translate(-1px, -1px);
+        }
+
+        .btn-reset {
+            background: var(--surface-toolbar); color: var(--color-text);
+        }
+        .btn-reset:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-elevated);
+            transform: translate(-1px, -1px);
+        }
+
+        /* =============================================
+           Status Message
+           ============================================= */
+        .status-msg {
+            text-align: center; font-size: 0.75rem; min-height: 22px; margin-top: 6px;
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            letter-spacing: 0.04em;
+            transition: all var(--dur-fast) var(--spring);
+            color: var(--color-error); font-weight: 700;
+        }
+        .status-msg.info { color: var(--color-primary); }
+
+        .privacy-notice {
+            text-align: center; font-size: 0.6875rem; margin-top: 4px;
+            color: var(--color-text-secondary); opacity: 0.6;
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            letter-spacing: 0.03em;
+        }
+
+        /* =============================================
+           Main Content Layout
+           ============================================= */
+        .main-content { display: flex; gap: 20px; flex: 1; margin-top: 8px; }
+
+        /* Map Panel — Cartographic Archive */
+        .map-panel {
+            flex: 2; min-width: 0;
+            background: var(--surface-elevated);
+            border: var(--border); border-radius: var(--radius-sm);
+            padding: 18px; display: flex; flex-direction: column; position: relative;
+            box-shadow: var(--shadow-elevated);
+            transition: box-shadow var(--dur-fast) var(--spring);
+            animation: reveal-scale var(--dur-slow) var(--ease-out-expo) 0.12s both;
+        }
+        .map-panel .map-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6875rem; letter-spacing: 0.12em; color: var(--color-text-secondary);
+            text-align: center; margin-bottom: 4px; font-weight: 700;
+            text-transform: uppercase;
+            padding: 0 120px;
+        }
+        .map-breadcrumb {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            padding: 0 120px 6px;
+            border-bottom: 2px solid var(--color-primary);
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+        }
+        .map-breadcrumb button,
+        .map-breadcrumb span {
+            border: 0;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font: inherit;
+            font-weight: 700;
+        }
+        .map-breadcrumb button {
+            cursor: pointer;
+        }
+        .map-breadcrumb button:hover {
+            color: var(--color-primary);
+        }
+        .map-breadcrumb span:not(:last-child)::after,
+        .map-breadcrumb button:not(:last-child)::after {
+            content: '/';
+            margin-left: 6px;
+            color: var(--color-text-secondary);
+        }
+        #chinaMap { flex: 1; min-height: 480px; }
+        .map-loading {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            color: var(--color-text-secondary); font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em;
+        }
+        /* Square spinner — mechanical, not circular */
+        .spinner {
+            width: 28px; height: 28px;
+            border: 2px solid var(--spinner-track);
+            border-top-color: var(--color-primary);
+            border-right-color: var(--color-primary);
+            border-radius: 2px;
+            animation: spin 0.6s steps(8, end) infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Back-to-national pill */
+        .btn-back-national {
+            position: absolute; top: 14px; left: 14px; z-index: 10;
+            display: none; align-items: center; gap: 6px;
+            padding: 6px 14px; font-size: 0.6875rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em;
+            text-transform: uppercase;
+            background: var(--surface-toolbar);
+            border: var(--border); border-radius: var(--radius-sm);
+            color: var(--color-text-secondary); cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+            transition: all var(--dur-fast) var(--spring);
+            white-space: nowrap;
+        }
+        .btn-back-national.visible { display: flex; }
+        .btn-back-national:hover {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-elevated);
+            transform: translate(-1px, -1px);
+        }
+        .btn-back-national:active { transform: translate(1px, 1px); box-shadow: none; }
+        .btn-back-national svg { width: 13px; height: 13px; }
+
+        /* =============================================
+           Info Panel — Administrative Records
+           ============================================= */
+        .info-panel {
+            flex: 1; min-width: 280px;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .notice-card {
+            background: var(--surface-primary);
+            border: var(--border-subtle);
+            border-left: 3px solid var(--color-primary);
+            padding: 10px 12px;
+            color: var(--color-text-secondary);
+            font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+            font-size: 0.72rem;
+            line-height: 1.7;
+            letter-spacing: 0.03em;
+            box-shadow: var(--shadow-subtle);
+        }
+        .notice-card[hidden] { display: none; }
+        .region-note {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+        .info-card {
+            background: var(--surface-primary);
+            border: var(--border); border-radius: var(--radius-sm);
+            padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+            box-shadow: var(--shadow-subtle);
+            transition: border-color var(--dur-fast) var(--spring),
+                        box-shadow var(--dur-fast) var(--spring),
+                        transform var(--dur-fast) var(--spring);
+            opacity: 0;
+        }
+        .info-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-elevated);
+        }
+        [data-theme="dark"] .info-card:hover {
+            border-color: var(--color-primary);
+        }
+        .info-card.highlight {
+            border-color: var(--color-primary) !important;
+            border-width: 3px;
+            box-shadow: 6px 6px 0 rgba(196,30,58,0.15);
+            transform: translate(-2px, -2px);
+            background: var(--surface-toolbar);
+        }
+        [data-theme="dark"] .info-card.highlight {
+            box-shadow: 6px 6px 0 rgba(232,52,78,0.18);
+        }
+        .info-card .info-icon {
+            min-width: 1.4em;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: var(--icon-color);
+            font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+            font-size: 0.82rem; font-weight: 800; letter-spacing: 0.08em;
+        }
+        .info-card .info-icon span {
+            line-height: 1.1;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+        }
+        .info-icon.ancestral,
+        .info-icon.zodiac,
+        .info-icon.gender,
+        .info-icon.chinese-zodiac { color: var(--icon-color); }
+        .info-card .info-body { display: flex; flex-direction: column; gap: 3px; }
+        .info-card .info-value {
+            font-family: 'ZCOOL XiaoWei', 'STSong', 'SimSun', serif;
+            font-size: clamp(1.05rem, 1rem + 0.4vw, 1.35rem);
+            font-weight: 400; color: var(--color-text);
+            letter-spacing: 0.04em;
+        }
+        /* =============================================
+           Footer — Archive Stamp
+           ============================================= */
+        .footer {
+            text-align: center; padding: 16px 0 8px; margin-top: 8px;
+            border-top: 2px solid var(--color-primary);
+            color: var(--color-text-secondary); font-size: 0.625rem;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.10em; font-weight: 700; text-transform: uppercase;
+        }
+
+        /* =============================================
+           Staggered Entrance Animation
+           ============================================= */
+        @keyframes reveal-up {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes reveal-down {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes reveal-scale {
+            from { opacity: 0; transform: scale(1.02); filter: blur(1px); }
+            to   { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateX(-6px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .info-card {
+            animation: card-enter var(--dur-slow) var(--ease-out-expo) both;
+        }
+        .info-card:nth-of-type(1) { animation-delay: 0ms; }
+        .info-card:nth-of-type(2) { animation-delay: 50ms; }
+        .info-card:nth-of-type(3) { animation-delay: 100ms; }
+        .info-card:nth-of-type(4) { animation-delay: 150ms; }
+
+        /* =============================================
+           Responsive Layout
+           ============================================= */
+        @media (max-width: 900px) {
+            .main-content { flex-direction: column; }
+            .map-panel { min-height: 380px; }
+            #chinaMap { min-height: 340px; }
+            .info-panel { flex-direction: row; flex-wrap: wrap; }
+            .info-card { flex: 1; min-width: 200px; }
+            .header h1 { font-size: clamp(1.1rem, 1rem + 1vw, 1.4rem); }
+            .input-card input { font-size: 0.9375rem; min-width: 200px; }
+            .header-actions { position: static; transform: none; margin-left: auto; }
+            .theme-toggle:hover, .easter-toggle:hover { transform: translate(-1px, -1px); }
+            .theme-toggle:active, .easter-toggle:active { transform: translate(1px, 1px); }
+            .bg-particles::before,
+            .bg-particles::after { display: none; }
+        }
+        @media (max-width: 500px) {
+            .app-container { padding: 10px; }
+            .input-card { padding: 14px; gap: 8px; border-width: 1px; }
+            .info-panel { flex-direction: column; }
+            .input-card input { font-size: 0.875rem; letter-spacing: 0.10em; min-width: 180px; }
+            .btn-back-national { top: 8px; left: 8px; padding: 5px 10px; font-size: 0.625rem; }
+            .map-panel .map-title,
+            .map-breadcrumb { padding-inline: 96px; }
+            .info-card { border-width: 1px; }
+            .map-panel { border-width: 1px; padding: 12px; }
+            .header { border-bottom-width: 1px; }
+        }
+
+        /* Short viewports */
+        @media (max-height: 700px) {
+            .app-container { padding: 8px 14px; }
+            .input-card { padding: 10px 14px; margin: 6px 0; }
+            .info-card { padding: 10px 14px; }
+            .map-panel { padding: 10px; }
+        }
+
+        /* =============================================
+           Performance — strip effects on low-end
+           ============================================= */
+        @media (hover: none) and (pointer: coarse) {
+            .bg-particles,
+            .bg-particles::before,
+            .bg-particles::after { display: none; }
+            .info-card, .map-panel, .input-card, .btn, .theme-toggle, .easter-toggle {
+                box-shadow: 1px 1px 0 rgba(0,0,0,0.08);
+            }
+        }
+
+        /* =============================================
+           Accessibility
+           ============================================= */
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0;
+            margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+            white-space: nowrap; border: 0;
+        }
+        :focus-visible {
+            outline: 3px solid var(--color-primary);
+            outline-offset: 3px;
+            border-radius: 2px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .btn:active { transform: none !important; }
+            .info-card:hover { transform: none !important; }
+        }
+        @media (prefers-contrast: more) {
+            .input-card, .map-panel, .info-card, .btn {
+                background: var(--color-surface);
+                border: 2px solid currentColor;
+            }
+        }

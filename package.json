@@ -1,0 +1,12 @@
+{
+  "name": "id-map-con",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check-syntax.mjs",
+    "test": "node tests/run-tests.mjs",
+    "serve": "python -m http.server 8787 --bind 127.0.0.1",
+    "serve:lan": "python -m http.server 8787 --bind 0.0.0.0"
+  }
+}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国身份证地图查询系统</title>
+    <script src="./vendor/echarts/echarts-loader.js"></script>
+    <link rel="stylesheet" href="./styles/idmap.css">
+</head>
+<body>
+    <noscript><p style="text-align:center;padding:40px;font-family:sans-serif;color:#C41E3A;">本页面需要启用 JavaScript 才能使用地图查询功能。</p></noscript>
+    <div class="bg-particles"></div>
+    <div class="app-container">
+        <header class="header">
+            <div class="brand">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                </div>
+                <div class="header-text">
+                    <h1>中国身份证地图查询系统</h1>
+                    <p class="subtitle">身份证号码解析 · 行政区划定位 · 个人信息展示</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="btnTheme" title="切换主题" aria-label="切换暗色/亮色主题">
+                    <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </button>
+                <label class="easter-toggle" for="easterMode" title="彩蛋模式">
+                    <input type="checkbox" id="easterMode">
+                    <span>彩蛋模式</span>
+                </label>
+            </div>
+        </header>
+
+        <div class="input-card" id="inputCard">
+            <label for="idInput">身份证号</label>
+            <input type="text" id="idInput" placeholder="请输入 18 位身份证号码" maxlength="20" autocomplete="off" aria-describedby="statusMsg">
+            <label class="extend-toggle" for="extendedMode">
+                <input type="checkbox" id="extendedMode">
+                <span>扩展定位</span>
+            </label>
+            <select id="extendedLocation" class="extend-select" aria-label="选择港澳台扩展定位地区" disabled>
+                <option value="">选择地区</option>
+            </select>
+            <button class="btn btn-primary" id="btnQuery">查询</button>
+            <button class="btn btn-demo" id="btnDemo">演示</button>
+            <button class="btn btn-reset" id="btnReset">重置</button>
+        </div>
+        <div class="status-msg" id="statusMsg" aria-live="polite" role="alert"></div>
+        <p class="privacy-notice">本工具仅在浏览器本地解析身份证号码，不上传、不保存，也不会写入网址。</p>
+
+        <div class="main-content">
+            <div class="map-panel" id="mapPanel">
+                <div class="map-title" id="mapTitle">中国行政区划图</div>
+                <nav class="map-breadcrumb" id="mapBreadcrumb" aria-label="地图层级导航">
+                    <button type="button" data-level="national">全国</button>
+                </nav>
+                <button class="btn-back-national" id="btnBackNational" title="返回全国地图" aria-label="返回全国地图视图">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"/>
+                        <polyline points="12 19 5 12 12 5"/>
+                    </svg>
+                    返回全国
+                </button>
+                <div id="chinaMap"></div>
+                <div class="map-loading" id="mapLoading" role="status" aria-live="polite">
+                    <div class="spinner"></div>
+                    <span>地图加载中...</span>
+                </div>
+            </div>
+            <div class="info-panel" id="infoPanel">
+                <div class="notice-card region-note" id="regionNote" hidden></div>
+                <div class="notice-card data-source-note">
+                    区划数据来源：国家统计局行政区划规则 / DataV GeoAtlas。身份证地址码可能对应签发时区划，和当前地图边界存在差异。
+                </div>
+                <div class="info-card">
+                    <div class="info-icon ancestral">
+                        <span>籍贯</span>
+                    </div>
+                    <div class="info-body">
+                        <span class="info-value" id="valAncestral">——</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon zodiac">
+                        <span>星座</span>
+                    </div>
+                    <div class="info-body">
+                        <span class="info-value" id="valZodiac">——</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon gender">
+                        <span>性别</span>
+                    </div>
+                    <div class="info-body">
+                        <span class="info-value" id="valGender">——</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon chinese-zodiac">
+                        <span>生肖</span>
+                    </div>
+                    <div class="info-body">
+                        <span class="info-value" id="valChineseZodiac">——</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">Identity Card Map Query System &copy; 2026</footer>
+    </div>
+
+    <script type="module" src="./scripts/app.js"></script>
+</body>
+</html>
