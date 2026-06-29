@@ -4,43 +4,11 @@
 
 ## 运行
 
-### 本机访问
-
 ```bash
 npm run serve
 ```
 
-打开 `http://127.0.0.1:8787/`。
-
-### 局域网共享
-
-```bash
-npm run serve:lan
-```
-
-查看本机 IP（Windows：`ipconfig`，macOS/Linux：`ip addr` 或 `ifconfig`），然后让同网段的其他人访问：
-
-```
-http://<本机IP>:8787/
-```
-
-Windows 首次运行时，防火墙可能弹出提示，选择"允许访问"即可。若无提示但他人无法访问，请在 Windows Defender 防火墙中手动放行 TCP 入站端口 8787。
-
-在 Windows 上，如果 `python` 不可用，请使用：
-
-```powershell
-py -m http.server 8787 --bind 0.0.0.0
-```
-
-### 公网静态托管
-
-本项目是纯静态应用，可直接部署到 GitHub Pages、Netlify、Cloudflare Pages 或 Vercel 等平台，无需后端。
-
-部署前建议：
-- 将 `vendor/echarts/echarts.min.js` 放入项目（ECharts 5.5.0 本地文件），确保无网络时也能加载地图组件。
-- 如需完全离线可用，可将省/市 GeoJSON 文件下载到 `assets/maps/`（命名规则：`prov_<adcode>.json` / `city_<adcode>.json`）。
-
-部署后访问站点根路径 `/` 即可打开应用。
+打开 `http://127.0.0.1:8787/idmap.html`。
 
 ## 检查与测试
 
@@ -53,7 +21,7 @@ npm test
 
 ## 项目结构
 
-- `idmap.html`：页面结构及本地第三方脚本引用。
+- `idmap.html`：主入口页。
 - `styles/idmap.css`：布局、主题、地图和表单样式。
 - `scripts/app.js`：页面编排、事件处理、查询流程。
 - `scripts/core/parser.js`：身份证校验与个人信息解析。
@@ -75,6 +43,6 @@ ECharts 固定使用 5.5.0 版本。推荐使用本地 `vendor/echarts/echarts.m
 
 ## 当前限制
 
-- 省/市/区县地理数据依赖远程 DataV GeoJSON 响应。
+- 已补齐的全国图、常用省份和部分常见城市可走本地 GeoJSON；未补齐的省/市/区县仍依赖远程 DataV GeoJSON 响应。
 - 香港、澳门和台湾的身份证地区码不包含精确的区县坐标，因此扩展位置模式使用用户选择的代表性中心点。
 - 农历数据为静态数据，支持更晚年份时需手动维护。

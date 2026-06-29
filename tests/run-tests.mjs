@@ -3,6 +3,7 @@ import { PersonalInfo } from '../scripts/core/parser.js';
 import { MapLocator } from '../scripts/core/map-locator.js';
 import { getExtendedLocation, getExtendedLocationGroup } from '../scripts/data/extended-location-data.js';
 import { getProvinceCodeByName, PROVINCE_MAP, SPECIAL_REGION_CODES } from '../scripts/data/region-data.js';
+import { formatAncestralHome } from '../scripts/utils/format-ancestral-home.js';
 
 function buildId(areaCode, birthDate, sequenceCode) {
     const body = `${areaCode}${birthDate}${sequenceCode}`;
@@ -186,6 +187,38 @@ function testParserEdgeCases() {
     assert.equal(shortPerson.isValid(), false);
 }
 
+function testFormatAncestralHome() {
+    // 普通省份 + 城市
+    assert.equal(formatAncestralHome({
+        provinceCode: '44', provinceName: '广东省', cityName: '深圳市', countyName: '',
+    }), '广东省 深圳市');
+
+    // 直辖市：省名 === 市名时省略重复
+    assert.equal(formatAncestralHome({
+        provinceCode: '11', provinceName: '北京市', cityName: '北京市', countyName: '',
+    }), '北京市');
+
+    // 直辖市 + 区县
+    assert.equal(formatAncestralHome({
+        provinceCode: '11', provinceName: '北京市', cityName: '北京市', countyName: '东城区',
+    }), '北京市 东城区');
+
+    // 直辖市 + 市名不同于省名
+    assert.equal(formatAncestralHome({
+        provinceCode: '50', provinceName: '重庆市', cityName: '重庆市', countyName: '渝中区',
+    }), '重庆市 渝中区');
+
+    // 普通省份 + 区县（无城市名时）
+    assert.equal(formatAncestralHome({
+        provinceCode: '44', provinceName: '广东省', cityName: '', countyName: '南山区',
+    }), '广东省 南山区');
+
+    // 仅省份
+    assert.equal(formatAncestralHome({
+        provinceCode: '65', provinceName: '新疆维吾尔自治区', cityName: '', countyName: '',
+    }), '新疆维吾尔自治区');
+}
+
 testParser();
 testInvalidProvinceCode();
 testSpecialRegions();
@@ -195,5 +228,6 @@ testRegionData();
 testMapLocator();
 testLocatorEdgeCases();
 testParserEdgeCases();
+testFormatAncestralHome();
 
 console.log('All tests passed');

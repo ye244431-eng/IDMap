@@ -1,3 +1,9 @@
+// 港澳台扩展定位数据：DataV 没有这些地区的区县级 GeoJSON，
+// 在身份证号无法解析到具体区县时，由用户在 UI 上手选一个代表点，
+// 地图会用 effectScatter 在对应坐标处展示涟漪标记。
+// 数据中的 center 是 [经度, 纬度]，与 ECharts geo 坐标系一致。
+
+// 台湾扩展定位组：直辖市 + 部分县。71 与 83 共用同一组数据，因此提取成常量复用。
 const TAIWAN_EXTENDED_GROUP = {
     label: '台湾扩展定位',
     defaultId: 'taipei',
@@ -12,6 +18,7 @@ const TAIWAN_EXTENDED_GROUP = {
     ],
 };
 
+// 按身份证省级编码（前 2 位）组织的扩展定位数据
 export const EXTENDED_LOCATION_GROUPS = {
     '71': TAIWAN_EXTENDED_GROUP,
     '83': TAIWAN_EXTENDED_GROUP,
@@ -48,6 +55,8 @@ export function getExtendedLocationGroup(provinceCode) {
     return EXTENDED_LOCATION_GROUPS[provinceCode] || null;
 }
 
+// 获取具体扩展点位：locationId 优先 → 该组 defaultId → 列表第一项。
+// 多重 fallback 让调用方在传空字符串或非法 id 时也能拿到合理结果。
 export function getExtendedLocation(provinceCode, locationId) {
     const group = getExtendedLocationGroup(provinceCode);
     if (!group) return null;

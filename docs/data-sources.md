@@ -2,9 +2,15 @@
 
 ## 地图数据
 
-应用通过 `MapDataService` 从 DataV URL 加载全国及省级 GeoJSON 数据。若全国地图远程请求失败，则回退至 `assets/maps/china.json`。
+应用通过 `MapDataService` 加载全国、省级和城市级 GeoJSON 数据。
 
-省级和区县级下钻数据仍仅支持远程加载。若这些请求失败，应用仍可高亮省级区域，但更精细的定位可能不可用。
+当前加载策略：
+- 全国图优先读取 `assets/maps/china.json`
+- 省级图优先读取 `assets/maps/prov_<adcode>.json`
+- 城市/区县图优先读取 `assets/maps/city_<adcode>.json`
+- 本地缺失时，再回退到 DataV URL
+
+当前仓库已经包含全国图、常用省份以及部分常见城市的本地 GeoJSON，常规查询会优先命中本地资源。未补齐的区域仍可能依赖远程 DataV；若这些请求失败，应用仍可显示全国图或省级高亮，但更精细的定位可能不可用。
 
 ## 香港、澳门与台湾
 

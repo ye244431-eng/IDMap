@@ -1,3 +1,9 @@
+// 行政区划代码映射：身份证地址码 → 区划名称
+// 数据依据 GB/T 2260（中华人民共和国行政区划代码）。
+// 编码规则：前 2 位省级、前 4 位市级（地级市/自治州/盟）、前 6 位区县级。
+
+// 省级映射：身份证前 2 位 → 省/直辖市/自治区/特别行政区名称
+// 注：71 与 83 都用于台湾省（71 是历史码，83 是部分系统中的扩展码），故指向同一名称
 export const PROVINCE_MAP = {
     '11': '北京市',
     '12': '天津市',
@@ -36,6 +42,7 @@ export const PROVINCE_MAP = {
     '83': '台湾省',
 };
 
+// 市级映射：身份证前 4 位 → 城市名称（覆盖大陆全部地级市/自治州/盟）
 export const CITY_MAP = {
     '1101': '北京市',
     '1201': '天津市',
@@ -380,9 +387,13 @@ export const CITY_MAP = {
     '6590': '自治区直辖县级行政区划',
 };
 
+// 直辖市编码：北京 / 天津 / 上海 / 重庆。这些省份的省级 GeoJSON 实际只有区县层，
+// 没有"市"这一中间层级，因此地图模块需要做特殊分支处理。
 export const MUNICIPALITY_CODES = ['11', '12', '31', '50'];
+// 港澳台编码：DataV 不提供精确区县 GeoJSON，需要通过用户手选 + 预置坐标点位实现"扩展定位"
 export const SPECIAL_REGION_CODES = ['71', '81', '82', '83'];
 
+// 港澳台对应的提示文案，告知用户位置精度受限
 export const SPECIAL_REGION_MESSAGES = {
     '71': '台湾地区暂不支持精确定点，已在全国地图高亮显示',
     '81': '香港地区暂不支持精确定点，已在全国地图高亮显示',
@@ -391,6 +402,7 @@ export const SPECIAL_REGION_MESSAGES = {
 };
 
 
+// 通过省份名反查身份证编码。用于地图浏览模式下用户点击其他省份时定位 GeoJSON。
 export function getProvinceCodeByName(provinceName) {
     return Object.entries(PROVINCE_MAP).find(([, name]) => name === provinceName)?.[0] || '';
 }

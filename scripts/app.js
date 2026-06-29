@@ -3,6 +3,7 @@ import { PersonalInfo } from './core/parser.js';
 import { SPECIAL_REGION_CODES, SPECIAL_REGION_MESSAGES } from './data/region-data.js';
 import { getExtendedLocation, getExtendedLocationGroup } from './data/extended-location-data.js';
 
+// 简单防抖：避免主题按钮在动画过程中被高频点击导致渲染抖动
 function debounce(fn, delay) {
     let timer = null;
     return function debounced(...args) {
@@ -11,6 +12,7 @@ function debounce(fn, delay) {
     };
 }
 
+// 页面应用入口：负责绑定 DOM 事件、协调身份证解析和地图显示，并维护 UI 状态
 class App {
     constructor() {
         this.mapDisplay = null;
@@ -67,15 +69,6 @@ class App {
     _setBreadcrumb(parts = ['全国']) {
         if (!this.mapBreadcrumb) return;
 
-        // 清理旧按钮的事件监听器
-        // 使用 cloneNode(true) 复制节点但不复制事件监听器
-        const oldButtons = this.mapBreadcrumb.querySelectorAll('button');
-        oldButtons.forEach(btn => {
-            const clone = btn.cloneNode(true);
-            btn.parentNode.replaceChild(clone, btn);
-        });
-
-        // 清空并重建
         this.mapBreadcrumb.innerHTML = '';
 
         parts.forEach((part, index) => {
@@ -105,19 +98,22 @@ class App {
         return this.idInput.value.replace(/\s/g, '').toUpperCase();
     }
 
+    // 输入框格式化：去掉非法字符 + 自动按 6/8/4 分组（地址码 / 出生日 / 顺序+校验），便于人眼核对
     _formatIdInput(value) {
         const clean = value.replace(/\s/g, '').toUpperCase().replace(/[^0-9X]/g, '').slice(0, 18);
         return [clean.slice(0, 6), clean.slice(6, 14), clean.slice(14)].filter(Boolean).join(' ');
     }
 
+    // "彩蛋模式"：勾选后输入完整身份证号会触发跳转（互联网经典 rickroll 段子）
     _triggerEasterEgg() {
         if (!this.easterMode.checked || this._getCleanId().length !== 18) return false;
 
         window.confirm('验证身份失败');
-        window.location.href = 'https://www.bilibili.com/video/BV1GJ411x7h7/?t=0&spm_id_from=333.337.search-card.all.click&vd_source=f74cd92ff31e6051640e6324df86fc89';
+        window.location.href = `https://www.bilibili.com/video/BV1GJ411x7h7/?t=0&spm_id_from=333.337.search-card.all.click&vd_source=f74cd92ff31e6051640e6324df86fc89&_=${Date.now()}`;
         return true;
     }
 
+    // 港澳台需要在信息面板显示提示语，说明位置精度限制（仅省级，或用户手选的代表性中心点）
     _updateRegionNote(person = this.currentPerson, extendedLocation = null) {
         if (!this.regionNote) return;
         if (!person || !SPECIAL_REGION_CODES.includes(person.getProvinceCode())) {
@@ -134,10 +130,11 @@ class App {
         this.regionNote.hidden = false;
     }
 
+    // 监听地图标题变化，自动同步面包屑：地图模块在内部更新标题时面包屑随之更新
     _observeMapTitle() {
         if (!this.mapTitle) return;
 
-        // 如果已有 observer，先断开
+        // 重复调用时先断开旧 observer，避免重复订阅
         if (this._mapTitleObserver) {
             this._mapTitleObserver.disconnect();
         }
@@ -146,7 +143,7 @@ class App {
         this._mapTitleObserver.observe(this.mapTitle, {
             childList: true,
             characterData: true,
-            subtree: true
+            subtree: true,
         });
     }
 
@@ -177,7 +174,21 @@ class App {
     }
 
     async _initMap() {
-        this.mapDisplay = new ChinaMapDisplay('chinaMap');
+        this.mapDisplay = new ChinaMapDisplay('chinaMap', undefined, {
+            onTitleChange: (text) => {
+                if (this.mapTitle) this.mapTitle.textContent = text;
+            },
+            onBackButtonChange: (visible) => {
+                const button = document.getElementById('btnBackNational');
+                if (!button) return;
+                if (visible) {
+                    button.classList.add('visible');
+                    window.setTimeout(() => button.focus(), 100);
+                } else {
+                    button.classList.remove('visible');
+                }
+            },
+        });
         const ok = await this.mapDisplay.init();
 
         if (this.mapLoading) {
@@ -185,16 +196,32 @@ class App {
         }
 
         if (!ok) {
-            this.setStatus('地图数据加载失败，请检查网络连接后刷新页面');
+            this.setStatus('地图数据加载失败，请刷新页面重试');
 
-            // 禁用查询按钮，避免用户在地图未初始化时查询
             this.btnQuery.disabled = true;
             this.btnDemo.disabled = true;
         }
     }
 
+    _readThemePreference() {
+        try {
+            return localStorage.getItem('idmap-theme');
+        } catch {
+            return null;
+        }
+    }
+
+    _saveThemePreference(theme) {
+        try {
+            localStorage.setItem('idmap-theme', theme);
+        } catch {
+            // 存储不可用时静默降级
+        }
+    }
+
+    // 主题持久化：localStorage 中的偏好优先于默认值，刷新后保持用户选择
     _initTheme() {
-        const savedTheme = localStorage.getItem('idmap-theme') || 'light';
+        const savedTheme = this._readThemePreference() || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         this._updateThemeButton(savedTheme);
     }
@@ -203,8 +230,9 @@ class App {
         const current = document.documentElement.getAttribute('data-theme');
         const next = current === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('idmap-theme', next);
+        this._saveThemePreference(next);
         this._updateThemeButton(next);
+        // 主题色由 CSS 变量驱动，但 ECharts 配置已经定型，需要触发地图重渲染让新颜色生效
         this.mapDisplay?.refreshTheme();
     }
 
@@ -222,6 +250,7 @@ class App {
         }
     }
 
+    // 主查询入口：解析身份证 → 在信息面板填充结果 → 触发地图定位流程
     async handleQuery() {
         if (this._triggerEasterEgg()) return;
 
@@ -241,12 +270,14 @@ class App {
         }
 
         this.currentPerson = person;
+        // 第一步：先用省级数据填充，保证用户立即看到反馈，区县名待地图异步解析后再补
         const initialSummary = person.getSummary({ provinceOnly: true });
         this._updateInfoPanel(initialSummary);
         this._setBreadcrumb(['全国', initialSummary.provinceName]);
         this.setQueryLoading(true);
         this.setStatus('正在定位...', 'info');
 
+        // beginQuery 必须早于地图调用，旧请求会因 token 失效而被取消
         const queryContext = this.mapDisplay?.beginQuery();
         const extendedLocation = this._getSelectedExtendedLocation(person.getProvinceCode());
         this._updateRegionNote(person, extendedLocation);
@@ -254,6 +285,7 @@ class App {
             await this.mapDisplay?.highlightProvince(
                 initialSummary.provinceName,
                 initialSummary,
+                // 地图模块在解析到具体区县后通过这个回调把更详细的地址回填到信息面板
                 (location) => {
                     this._handleResolvedLocation(person, location);
                 },
@@ -261,10 +293,12 @@ class App {
                 { extendedLocation }
             );
             this._syncBreadcrumbFromTitle();
+            // 仅当状态消息仍是初始 "正在定位..." 时才清空，避免覆盖回调里设置的港澳台提示
             if (this.statusMsg.textContent === '正在定位...') {
                 this.clearStatus();
             }
         } catch (error) {
+            // AbortError 来自上一次查询被新查询打断，属正常流程，不应提示用户
             if (error.name !== 'AbortError') {
                 console.error('[ErrorBoundary] 地图定位失败', error);
                 this.setStatus('身份证信息已解析，但地图数据加载失败，请检查网络后重试');
@@ -274,6 +308,7 @@ class App {
         }
     }
 
+    // 地图模块解析完成的回调：根据返回的 location 类型决定状态提示与籍贯刷新
     _handleResolvedLocation(person, location = {}) {
         if (location.isSpecialRegion) {
             this._updateRegionNote(person);
@@ -295,6 +330,7 @@ class App {
         this.clearStatus();
     }
 
+    // 籍贯卡片高亮闪烁：用户能立刻感知到地址精度从省级提升到了市/区县
     _animateAncestral(text) {
         const card = this.infoCards[0];
         this.valAncestral.textContent = text;
@@ -302,6 +338,7 @@ class App {
         window.setTimeout(() => card.classList.remove('highlight'), 600);
     }
 
+    // 演示按钮：从内置测试身份证号中随机选一个填入并查询，避免用户在隐私敏感场景下手输真号
     async handleDemo() {
         const demoIds = [
             '110101199003077512',
@@ -333,6 +370,7 @@ class App {
         this.idInput.focus();
     }
 
+    // 从区县级返回时分两步：先停留在省级视图（带籍贯展示），再退到全国
     async handleBackToNational() {
         await this.mapDisplay?.returnToNational(() => {
             if (!this.currentPerson) return;
@@ -342,6 +380,7 @@ class App {
         this._setBreadcrumb(['全国']);
     }
 
+    // 错峰显示：4 张信息卡依次高亮，整体过渡 0~300ms，避免一次性出现造成视觉冲击
     _updateInfoPanel(summary) {
         const animate = (card, element, text, delay) => {
             window.setTimeout(() => {
@@ -367,6 +406,7 @@ class App {
         this.currentResolvedLocation = null;
     }
 
+    // 输入框内容变化时同步更新扩展定位控件：仅港澳台号码可启用并选择具体区县
     _updateExtendedControls() {
         const provinceCode = this._getCleanId().substring(0, 2);
         const group = getExtendedLocationGroup(provinceCode);
@@ -385,11 +425,13 @@ class App {
 
         this.extendedMode.disabled = !group;
         this.extendedLocation.disabled = !enabled;
+        // 切换到非港澳台号码时强制取消勾选，避免遗留状态影响后续查询
         if (!group) {
             this.extendedMode.checked = false;
         }
     }
 
+    // 把扩展定位项规范成与普通解析结果同构的对象，便于地图模块统一处理
     _getSelectedExtendedLocation(provinceCode) {
         if (!this.extendedMode.checked) return null;
         const location = getExtendedLocation(provinceCode, this.extendedLocation.value);
@@ -401,20 +443,18 @@ class App {
         };
     }
 
+    // 资源回收：beforeunload 触发，确保事件监听器与 ECharts 实例不会泄漏
     dispose() {
-        // 断开 MutationObserver
         if (this._mapTitleObserver) {
             this._mapTitleObserver.disconnect();
             this._mapTitleObserver = null;
         }
 
-        // 清理地图显示实例
         if (this.mapDisplay) {
             this.mapDisplay.dispose();
             this.mapDisplay = null;
         }
 
-        // 清空引用
         this.currentPerson = null;
         this.currentResolvedLocation = null;
     }
@@ -423,32 +463,30 @@ class App {
 document.addEventListener('DOMContentLoaded', () => {
     window.__app = new App();
 
-    // 全局错误处理
+    // 全局错误兜底：避免单点未捕获的异常让用户卡在无反馈状态
     window.addEventListener('error', (event) => {
         console.error('[全局错误]', event.error);
         const app = window.__app;
         if (app) {
             app.setStatus('系统错误，请刷新页面重试');
         }
-        // 阻止默认行为，避免在控制台显示两次
+        // 阻止浏览器默认错误处理，避免控制台重复输出
         event.preventDefault();
     });
 
-    // 未处理的 Promise rejection
     window.addEventListener('unhandledrejection', (event) => {
         console.error('[未处理的 Promise 拒绝]', event.reason);
         const app = window.__app;
 
-        // AbortError 是正常的取消操作，不需要提示用户
+        // AbortError 是查询取消的正常路径，不应弹出错误提示
         if (app && event.reason?.name !== 'AbortError') {
             app.setStatus('操作失败，请重试');
         }
 
-        // 阻止默认行为
         event.preventDefault();
     });
 
-    // 页面卸载时清理资源
+    // 页面卸载时主动 dispose，避免离开后地图资源驻留
     window.addEventListener('beforeunload', () => {
         if (window.__app) {
             window.__app.dispose();
